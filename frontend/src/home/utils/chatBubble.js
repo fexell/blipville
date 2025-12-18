@@ -26,9 +26,9 @@ export function showChatBubble(app, player, text, style) {
   });
 
   let elapsed = 0;
-  const lifetime = 2500;
-  const fade = (delta) => {
-    elapsed += delta * 16.67;
+  const lifetime = 5500;
+  const fade = (ticker) => {
+    elapsed += ticker.deltaMS;
     if (elapsed > lifetime) {
       bubble.alpha -= 0.03;
       if (bubble.alpha <= 0) {
