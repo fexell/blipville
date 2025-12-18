@@ -28,7 +28,7 @@ const AuthLayout                            = ({ children, isRedirect, title, su
           {/* LEFT */}
           <div className={
             clsx(
-              'relative flex flex-1 flex-col w-full min-h-screen max-h-fit [@media(min-height:650px)]:justify-center items-center py-4 overflow-y-auto dark:bg-neutral-900'
+              'relative flex flex-1 flex-col w-full min-h-screen max-h-fit [@media(min-height:650px)]:justify-center items-center py-4 overflow-y-auto bg-neutral-50 dark:bg-neutral-900'
             )
           }>
             <div className='flex flex-col w-full justify-center items-center'>
@@ -49,7 +49,7 @@ const AuthLayout                            = ({ children, isRedirect, title, su
               </div>
               <header className={
                 clsx(
-                  'mb-4 dark:text-white'
+                  'mb-4 text-black dark:text-white'
                 )
               }>
                 <div>
@@ -66,7 +66,7 @@ const AuthLayout                            = ({ children, isRedirect, title, su
                 <div>
                   <p className={
                     clsx(
-                      'block text-center dark:text-white'
+                      'block text-center text-black dark:text-white'
                     )
                   }>
                     { footerText }&nbsp;

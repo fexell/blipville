@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { Routes, Route } from 'react-router'
+import { useNavigate, Routes, Route } from 'react-router'
 import { ToastContainer } from 'react-toastify'
 
 import MainLayout from './shared/layouts/Main.layout'
@@ -12,6 +12,7 @@ import VerifyEmailPage from './auth/pages/VerifyEmail.page'
 
 import { useCsrfToken } from './auth/hooks/useCsrfToken.hook'
 
+import useAuthStore from './auth/stores/Auth.store'
 import useThemeStore from './auth/stores/Theme.store'
 
 import './App.css'
@@ -19,10 +20,13 @@ import './App.css'
 const App                                   = () => {
   useCsrfToken()
 
+  const navigate                            = useNavigate()
+
   const {
     theme,
     setTheme
   }                                         = useThemeStore()
+  const userId                              = useAuthStore(( state ) => state.userId)
 
   useEffect(() => {
     const theme                             = JSON.parse( localStorage.getItem( 'theme' ) )

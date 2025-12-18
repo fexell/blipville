@@ -4,8 +4,8 @@ export const WORLD = { cols: 40, rows: 12, tileSize: 48 };
 
 export const textStyle = {
   fill: "#000000",
-  fontSize: 12,
+  fontSize: 16,
   fontFamily: "Arial",
   wordWrap: true,
-  wordWrapWidth: 120
+  wordWrapWidth: 200
 };

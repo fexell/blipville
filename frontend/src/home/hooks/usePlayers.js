@@ -13,7 +13,8 @@ export function createOrUpdatePlayer(app, playersRef, id, data = {}, isLocal) {
   }
 
   const cont = new Container();
-  cont.x = px; cont.y = py;
+  cont.x = px;
+  cont.y = py;
 
   const avatar = new Graphics();
   avatar.circle(0, 0, 14).fill(isLocal ? 0x66ccff : 0xffcc66);

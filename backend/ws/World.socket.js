@@ -3,6 +3,7 @@ import cookieParser from 'cookie-parser'
 
 import CookieHelper from '../helpers/Cookie.helper.js'
 
+import ChatModel from '../models/Chat.model.js'
 import UserModel from '../models/User.model.js'
 
 export default function worldSocket(io) {
@@ -74,11 +75,31 @@ export default function worldSocket(io) {
       const user                            = await UserModel.findById( socket.userId )
       if( !user ) return
 
+      const chat                            = new ChatModel({
+        userId                              : user._id,
+        username                            : user.username,
+        room                                : user.room,
+        message,
+      })
+
+      await chat.save()
+
       io.to( user.room ).emit( 'chatMessage', {
         id                                  : user._id.toString(),
         username                            : user.username,
         message,
       } )
+    })
+
+    socket.on('initChats', async () => {
+      const user                            = await UserModel.findById( socket.userId )
+      if( !user ) return
+
+      const history                         = await ChatModel.find({ room: user.room })
+        .sort({ createdAt: -1 })
+        .limit( 15 )
+
+      socket.emit('chatHistory', history)
     })
 
     socket.on('disconnect', async () => {

@@ -129,9 +129,9 @@ const AuthFormInputComponent                = ({
               <input
                 className={
                   clsx(
-                    'block w-full p-4 mb-4 border-2 border-transparent outline-0 rounded-full bg-neutral-100 focus:shadow-lg shadow-neutral-300 focus:border-blue-600',
+                    'block w-full p-4 mb-4 border-2 border-transparent outline-0 rounded-full bg-neutral-100 focus:shadow-lg shadow-neutral-300 focus:border-blue-600 text-black',
                     'dark:bg-neutral-800 dark:text-neutral-50 dark:focus:shadow-lg dark:shadow-neutral-950',
-                    'disabled:text-neutral-500 disabled:cursor-not-allowed',
+                    'disabled:text-neutral-500 disabled:cursor-not-allowed placeholder:text-neutral-400',
                     {
                     'text-red-600 border-red-600!': isTouched && !isValid,
                     'pl-14': !!icon,

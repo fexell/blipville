@@ -1,3 +1,5 @@
+import React from 'react'
+import { Navigate } from 'react-router'
 
 import Game from '../components/Game'
 
@@ -7,8 +9,23 @@ import { apiClient } from '../../auth/api/Axios.api'
 
 import useAsyncStatus from '../../auth/hooks/useAsyncStatus.hook'
 
+class ErrorBoundary extends React.Component {
+  state = { hasError: false }
+
+  static getDerivedStateFromError() {
+    return { hasError: true }
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return <h1>Something went wrong.</h1>
+    }
+    return this.props.children
+  }
+}
+
 const HomePage                              = () => {
-  const { clearUserId }                     = useAuthStore()
+  const { userId, clearUserId }                     = useAuthStore()
   const { run }                             = useAsyncStatus()
 
   const handleLogout                        = async () => {
@@ -23,9 +40,12 @@ const HomePage                              = () => {
 
   return (
     <>
-      <div className='p-4'>
-        <Game />
-        <button className='absolute top-4 right-4' onClick={ handleLogout }>Logout</button>
+      <div className='p-2'>
+        { userId && (
+          <ErrorBoundary>
+            <Game onLogout={handleLogout} />
+          </ErrorBoundary>
+        ) }
       </div>
     </>
   )
