@@ -1,0 +1,58 @@
+body {
+  font-family: "Inter", Arial, sans-serif;
+  color: #ddd;
+  background: #0f1720;
+}
+
+.app-root {
+  padding: 14px;
+}
+
+.game-wrapper {
+  display: flex;
+  gap: 12px;
+}
+
+.game-ui {
+  display: flex;
+  gap: 12px;
+}
+
+.game-ui > div:first-child {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.chat-panel {
+  width: 280px;
+  display: flex;
+  flex-direction: column;
+  background: #111;
+  padding: 8px;
+  border-radius: 8px;
+}
+
+.messages {
+  flex: 1;
+  overflow: auto;
+  max-height: 520px;
+}
+
+.msg {
+  margin-bottom: 6px;
+  font-size: 13px;
+}
+
+.chat-input {
+  display: flex;
+  gap: 8px;
+}
+
+.chat-input input {
+  flex: 1;
+  padding: 6px;
+}
+
+.chat-input button {
+  padding: 6px 10px;
+}

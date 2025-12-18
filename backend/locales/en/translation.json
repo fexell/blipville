@@ -1,0 +1,74 @@
+{
+  "user.created": "Sign up was successful. Verify your email address.",
+
+  "user.notFound": "User not found.",
+  "user.alreadyLoggedIn": "You are already logged in.",
+  "user.alreadyLoggedOut": "You are already logged out.",
+  "user.unauthorized": "This route is protected, and you are not authorized to access it.",
+  "user.notAuthenticated": "You are not authenticated.",
+  "user.noChanges": "You have not made any changes.",
+  "user.id.invalid": "User ID is invalid.",
+  "user.id.notFound": "User ID not found.",
+
+  "user.found": "User found.",
+  "user.updated": "User updated.",
+  "user.data.found": "User data found.",
+  "user.units.found": "Units found.",
+  
+  "user.login.success": "You are now logged in.",
+  "user.login.failed": "Login failed.",
+
+  "user.logout.success": "You are now logged out.",
+  "user.logout.forced": "You have been logged out.",
+  "user.logout.revoked": "You have been logged out, because this refresh token has been revoked.",
+  
+  "email.required": "Email is required.",
+  "email.taken": "Email is already in use.",
+  "email.notVerified": "Your email address is not yet verified.",
+  "email.alreadyVerified": "Your email address is already verified.",
+  "email.notFound": "Email not found.",
+  "email.token.notFound": "Email verification token not found.",
+  "email.query.notFound": "Email query not found.",
+  "email.token.record.notFound": "Email verification token record not found.",
+
+  "emailVerification.success": "Email verification was successful.",
+
+  "username.required": "Username is required.",
+  "username.invalid": "Username is invalid.",
+  "username.taken": "Username is already taken.",
+  "username.minlength": "Username must be at least 3 characters long.",
+  "username.maxlength": "Username must be at most 20 characters long.",
+  "username.variation": "Username can only be a different variation of your current username.",
+  "username.invalidSpaces": "Username cannot have leading or trailing spaces.",
+
+  "forename.required": "Forename is required.",
+  "forename.invalid": "Forename is invalid.",
+  "forename.minlength": "Forename must be at least 3 characters long.",
+
+  "surname.required": "Surname is required.",
+  "surname.invalid": "Surname is invalid.",
+  "surname.minlength": "Surname must be at least 3 characters long.",
+
+  "password.required": "Password is required.",
+  "password.invalid": "Password is invalid.",
+  "password.mismatch": "Passwords do not match.",
+  "password.minlength": "Password must be at least 6 characters long.",
+  "password.maxlength": "Password must be at most 64 characters long.",
+
+  "tokens.refreshed": "Tokens refreshed.",
+
+  "accessToken.invalid": "Access token is invalid.",
+
+  "refreshToken.notFound": "Refresh token not found.",
+  "refreshToken.invalidOrExpired": "Refresh token is invalid or expired.",
+  "refreshToken.revoked": "Refresh token has been revoked.",
+
+  "refreshTokens.revoked": "All refresh tokens have been revoked.",
+
+  "refreshTokenId.invalid": "Refresh token ID is invalid.",
+  "refreshTokenId.notFound": "Refresh token ID not found.",
+  "refreshTokenRecord.notFound": "Refresh token record not found.",
+  "refreshTokenRecord.revoked": "Refresh token has been revoked.",
+
+  "route.protected": "This route is protected, and you are not authorized to access it."
+}
