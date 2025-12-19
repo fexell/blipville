@@ -1,5 +1,14 @@
+.chat-wrapper {
+  scrollbar-width: 8px;
+  scrollbar-color: #888 transparent;
+}
 
+.chat-wrapper::-webkit-scrollbar {
+  width: 8px;
+}
 
-.Toastify__toast {
-  
+.chat-wrapper::-webkit-scrollbar-thumb {
+  margin: 0 4px;
+  border-radius: 4px;
+  background-color: #888;
 }

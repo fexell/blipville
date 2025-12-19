@@ -1,20 +1,25 @@
-// hooks/usePixiApp.js
 import { Container } from "pixi.js";
 import { buildRoom } from "../utils/rooms";
 import { forestLevel } from "../utils/levels";
-import app from "../utils/pixiApp";
+import { createPixiApp } from "../utils/pixiApp";
 
-export function usePixiApp(canvasRef, appRef) {
+export function usePixiApp(canvasRef, appRef, playersRef) {
   const initPixi = async () => {
     if (!canvasRef.current) return;
 
-    canvasRef.current.innerHTML = "";
-    canvasRef.current.appendChild(app.canvas);
+    if (appRef.current) {
+      appRef.current.destroy(true);
+      appRef.current = null;
+    }
+    if(playersRef?.current) playersRef.current = {};
+
+
+    const app = await createPixiApp(canvasRef.current);
     appRef.current = app;
 
     app.stage.sortableChildren = true;
 
-    // Create layers
+    // Layers
     const roomLayer = new Container();
     roomLayer.zIndex = 0;
 
@@ -24,15 +29,12 @@ export function usePixiApp(canvasRef, appRef) {
     const uiLayer = new Container();
     uiLayer.zIndex = 20;
 
-    app.stage.addChild(roomLayer);
-    app.stage.addChild(playersLayer);
-    app.stage.addChild(uiLayer);
+    app.stage.addChild(roomLayer, playersLayer, uiLayer);
 
-    // Build and add initial room
+    // Build initial room
     const room = await buildRoom(forestLevel);
     roomLayer.addChild(room);
 
-    // Save references for later use
     app.layers = { roomLayer, playersLayer, uiLayer };
 
     return app;

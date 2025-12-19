@@ -1,19 +1,21 @@
-import { Application } from 'pixi.js';
-import { WORLD } from './constants';
+import { Application } from "pixi.js";
+import { WORLD } from "./constants";
 
-const app = new Application();
+export async function createPixiApp(container) {
+  if (!container) throw new Error("Container div required for PIXI canvas");
 
-// WORLD.cols * WORLD.tileSize
-// WORLD.rows * WORLD.tileSize
+  const app = new Application();
+  await app.init({
+    background: 0x000000,
+    antialias: true,
+  });
 
-await app.init({
-  width: WORLD.cols * WORLD.tileSize,
-  height: WORLD.rows * WORLD.tileSize,
-  //background: 0x333333,
-  resolution: window.devicePixelRatio || 1,
-});
+  // Mount canvas
+  container.innerHTML = "";
+  container.appendChild(app.canvas);
 
-app.view.style.width = "100%";
-app.view.style.height = "auto";
+  // Set fixed world size
+  app.renderer.resize(WORLD.cols * WORLD.tileSize, WORLD.rows * WORLD.tileSize);
 
-export default app
+  return app;
+}
