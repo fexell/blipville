@@ -1,42 +1,39 @@
 // hooks/usePixiApp.js
-import { Application, Graphics } from "pixi.js";
-import { WORLD } from "../utils/constants";
+import { Container } from "pixi.js";
+import { buildRoom } from "../utils/rooms";
+import { forestLevel } from "../utils/levels";
+import app from "../utils/pixiApp";
 
 export function usePixiApp(canvasRef, appRef) {
-
   const initPixi = async () => {
-    const app = new Application();
-
-    await app.init({
-      width: WORLD.cols * WORLD.tileSize,
-      height: WORLD.rows * WORLD.tileSize,
-      background: 0x1e1e1e,
-      resolution: window.devicePixelRatio || 1,
-      resizeTo: window,
-    });
-
     if (!canvasRef.current) return;
 
     canvasRef.current.innerHTML = "";
     canvasRef.current.appendChild(app.canvas);
     appRef.current = app;
 
-    // Grid
-    const grid = new Graphics();
-    const tileSize = WORLD.tileSize;
-    const cols = Math.ceil(app.renderer.width / tileSize);
-    const rows = Math.ceil(app.renderer.height / tileSize);
+    app.stage.sortableChildren = true;
 
-    for (let r = 0; r < rows; r++) {
-      for (let c = 0; c < cols; c++) {
-        const x = c * tileSize;
-        const y = r * tileSize;
-        const color = (c + r) % 2 === 0 ? 0x2b2b2b : 0x282828;
-        grid.fill(color).rect(x, y, tileSize, tileSize);
-      }
-    }
+    // Create layers
+    const roomLayer = new Container();
+    roomLayer.zIndex = 0;
 
-    app.stage.addChild(grid);
+    const playersLayer = new Container();
+    playersLayer.zIndex = 10;
+
+    const uiLayer = new Container();
+    uiLayer.zIndex = 20;
+
+    app.stage.addChild(roomLayer);
+    app.stage.addChild(playersLayer);
+    app.stage.addChild(uiLayer);
+
+    // Build and add initial room
+    const room = await buildRoom(forestLevel);
+    roomLayer.addChild(room);
+
+    // Save references for later use
+    app.layers = { roomLayer, playersLayer, uiLayer };
 
     return app;
   };

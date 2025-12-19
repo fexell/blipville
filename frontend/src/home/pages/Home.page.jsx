@@ -40,10 +40,10 @@ const HomePage                              = () => {
 
   return (
     <>
-      <div className='p-2'>
+      <div className=''>
         { userId && (
           <ErrorBoundary>
-            <Game onLogout={handleLogout} />
+            <Game onLogout={handleLogout} level="forest" />
           </ErrorBoundary>
         ) }
       </div>

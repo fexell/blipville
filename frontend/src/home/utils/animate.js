@@ -4,7 +4,7 @@ export function animateTo(container, tx, ty) {
   if (!container) return;
   if (container._moveTicker) container._moveTicker.stop();
 
-  const speed = 240;
+  const speed = 180;
   const dx = tx - container.x;
   const dy = ty - container.y;
   const dist = Math.sqrt(dx*dx + dy*dy);

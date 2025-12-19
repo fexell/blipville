@@ -1,3 +1,5 @@
+// @refresh reset
+
 import React, { useEffect, useRef, useState } from "react";
 import ChatUI from "./ChatUI";
 import { usePixiApp } from "../hooks/usePixiApp";
@@ -10,7 +12,7 @@ import { textStyle } from "../utils/constants";
 import useAuthStore from '../../auth/stores/Auth.store';
 import "../styles/style.css";
 
-export default function Game({ onLogout }) {
+export default function Game({ onLogout, level = "forest" }) {
 
   const { userId } = useAuthStore();
 
@@ -23,7 +25,7 @@ export default function Game({ onLogout }) {
   const [input, setInput] = useState("");
 
   // PIXI init function
-  const { initPixi } = usePixiApp(canvasRef, appRef);
+  const { initPixi } = usePixiApp(canvasRef, appRef, level);
 
   // PIXI GAME lifecycle – replaces entire old useEffect
   usePixiGame(
@@ -31,7 +33,7 @@ export default function Game({ onLogout }) {
     appRef,
     socketRef,
     playersRef,
-    canvasRef                // ← same arguments from earlier
+    canvasRef
   );
 
   // Chat message handler (unchanged)
@@ -77,7 +79,7 @@ export default function Game({ onLogout }) {
     playerLeft: ({ id }) => {
       const p = playersRef.current[id];
       if (!p || !appRef.current) return;
-      appRef.current.stage.removeChild(p.container);
+      appRef.current.layers.playersLayer.removeChild(p.container);
       delete playersRef.current[id];
     },
     chatMessage: handleChat,
@@ -129,9 +131,11 @@ export default function Game({ onLogout }) {
   };
 
   return (
-    <div className="game-ui flex flex-col max-h-screen">
-      <div className="flex flex-row gap-2">
-        <div className="w-full" ref={canvasRef} />
+    <div className="game-ui flex flex-col min-h-screen max-h-screen justify-center items-center px-4">
+      <div className="flex flex-row gap-4 max-w-full mx-auto">
+        <div className="flex-1 grow-3 flex justify-center">
+          <div className="w-full max-w-8xl mx-auto" ref={canvasRef} />
+        </div>
         <ChatUI
           messages={[...messages]}
           input={input}
