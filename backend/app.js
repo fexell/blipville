@@ -49,27 +49,22 @@ App.use( MorganMiddleware )
 App.use( FingerprintMiddleware )
 App.use( LoggerMiddleware )
 
-// Import routes
-import ApiRouter from './routes/Api/Api.route.js'
-
-// Register /api route
-App.use( '/api', [ CsrfProtectionMiddleware.csrfSynchronisedProtection ], ApiRouter )
-
-// 404 route if the requested route is not found
-App.use( ( req, res, next ) => res.status( 404 ).send( 'Not Found', { url: req.url } ) )
-
 const server = http.createServer( App )
-const io = new SocketIOServer( server, {
+export const io = new SocketIOServer( server, {
   cors: {
     origin: 'http://localhost:5173',
     credentials: true,
   }
 } )
-const rooms = {
-  main: {
-    players: {},
-  },
-}
+
+// Import routes
+import Api from './routes/Api/Api.route.js'
+
+// Register /api route
+App.use( '/api', [ CsrfProtectionMiddleware.csrfSynchronisedProtection ], Api( io ) )
+
+// 404 route if the requested route is not found
+App.use( ( req, res, next ) => res.status( 404 ).send( 'Not Found', { url: req.url } ) )
 
 // Global error middleware
 import ErrorMiddleware from './middlewares/Error.middleware.js'

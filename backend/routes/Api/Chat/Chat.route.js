@@ -4,17 +4,11 @@ import ChatController from '../../../controllers/Chat.controller.js'
 
 import AuthMiddleware from '../../../middlewares/Auth.middleware.js'
 
-const ChatRouter                            = Router()
+export default function Chat( io ) {
+  const ChatRouter                            = Router()
 
-ChatRouter.post( '/', [
-  AuthMiddleware.ValidateTokens,
-  AuthMiddleware.Authenticate,
-  AuthMiddleware.VerifySessionData,
-  AuthMiddleware.RefreshTokenRevoked,
-  AuthMiddleware.EmailVerified,
-  AuthMiddleware.AccountInactive,
-], ChatController.Create )
+  // Chat Router
+  ChatRouter.post( '/', [], ChatController.Init( io ) )
 
-export {
-  ChatRouter as default,
+  return ChatRouter
 }

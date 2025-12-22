@@ -4,31 +4,46 @@ import { WORLD } from "./constants";
 export async function createPixiApp(container) {
   if (!container) throw new Error("Container div required for PIXI canvas");
 
+  const worldW = WORLD.cols * WORLD.tileSize;
+  const worldH = WORLD.rows * WORLD.tileSize;
+
   const app = new Application();
   await app.init({
-    width: WORLD.cols * WORLD.tileSize,
-    height: WORLD.rows * WORLD.tileSize,
+    width: worldW,
+    height: worldH,
     background: 0x000000,
     antialias: true,
     resolution: window.devicePixelRatio,
     autoDensity: true,
   });
 
-  // Mount canvas
   container.innerHTML = "";
   container.appendChild(app.canvas);
 
   app.canvas.style.width = "100%";
   app.canvas.style.height = "100%";
-  app.canvas.style.display = "block";
 
-  app.renderer.on("resize", () => {
-    const scaleX = app.renderer.width / (WORLD.cols * WORLD.tileSize);
-    const scaleY = app.renderer.height / (WORLD.rows * WORLD.tileSize);
-    const scale = Math.min(scaleX, scaleY);
+  function resize() {
+    const bounds = container.getBoundingClientRect();
+    const parentW = bounds.width;
+    const parentH = bounds.height;
 
+    app.renderer.resize(parentW, parentH);
+
+    const scale = Math.min(parentW / worldW, parentH / worldH);
     app.stage.scale.set(scale);
-  });
+
+    app.stage.position.set(
+      (parentW - worldW * scale) / 2,
+      (parentH - worldH * scale) / 2
+    );
+  }
+
+  resize();
+
+  window.addEventListener("resize", resize);
+  const observer = new ResizeObserver(resize);
+  observer.observe(container);
 
   return app;
 }

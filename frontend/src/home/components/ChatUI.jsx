@@ -15,7 +15,7 @@ export default function ChatUI({ messages, input, setInput, sendChat, maxLength 
       <div className="flex flex-row gap-2 p-4 pt-0">
         <div className='relative flex-1'>
           <input
-            className="flex-1 w-full min-w-0 px-2 py-3 pr-16 rounded-r-2xl bg-neutral-800"
+            className="flex-1 w-full min-w-0 px-2 py-2 pr-16 rounded-r-2xl bg-neutral-800"
             value={input}
             maxLength={maxLength}
             onChange={(e) => {

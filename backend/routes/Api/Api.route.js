@@ -8,20 +8,24 @@ import UserRouter from './User/User.route.js'
 import AuthRouter from './Auth/Auth.route.js'
 import ChatRouter from './Chat/Chat.route.js'
 
-const ApiRouter                             = Router()
 
-// CSRF Router
-ApiRouter.use( '/csrf', CsrfRouter )
+const Api                                   = ( io ) => {
+  const ApiRouter                           = Router()
+  // CSRF Router
+  ApiRouter.use( '/csrf', CsrfRouter )
 
-// User Router
-ApiRouter.use( '/user', [ multer().none() ], UserRouter )
+  // User Router
+  ApiRouter.use( '/user', [ multer().none() ], UserRouter )
 
-// Auth Router
-ApiRouter.use( '/auth', [ multer().none() ], AuthRouter )
+  // Auth Router
+  ApiRouter.use( '/auth', [ multer().none() ], AuthRouter )
 
-// Chat Router
-ApiRouter.use( '/chat', [ multer().none() ], ChatRouter )
+  // Chat Router
+  ApiRouter.use( '/chat', [ multer().none() ], ChatRouter( io ) )
+
+  return ApiRouter
+}
 
 export {
-  ApiRouter as default,
+  Api as default,
 }

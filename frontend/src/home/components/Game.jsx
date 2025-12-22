@@ -11,6 +11,7 @@ import useAuthStore from '../../auth/stores/Auth.store';
 import { showChatBubble } from '../utils/showChatBubble';
 import { showTypingBubble } from '../utils/showTypingBubble';
 import { WORLD } from '../utils/constants';
+import { apiClient } from '../../auth/api/Axios.api';
 import "../styles/style.css";
 
 export default function Game({ onLogout, level = "forest" }) {
@@ -147,7 +148,7 @@ export default function Game({ onLogout, level = "forest" }) {
     }
   }, [input]);
 
-  const sendChat = () => {
+  const sendChat = async () => {
     if (!socketRef.current || !input.trim()) return;
 
     // Stop typing bubble
@@ -167,7 +168,7 @@ export default function Game({ onLogout, level = "forest" }) {
 
   return (
     <div className="game-ui flex items-center justify-center min-h-screen w-full">
-      <div className="game-wrapper flex w-full max-w-8xl h-[700px] items-center justify-center">
+      <div className="game-wrapper flex w-full max-w-8xl h-[70vh] min-h-[400px] justify-center items-center">
         <button
           className="absolute top-4 right-4 text-white hover:text-neutral-50"
           onClick={handleLogoutClick}>Logout</button>

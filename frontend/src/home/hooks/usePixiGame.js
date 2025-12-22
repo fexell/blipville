@@ -21,15 +21,22 @@ export function usePixiGame(initPixi, appRef, socketRef, playersRef, canvasRef) 
       // Clear old players layer for Fast Refresh safety
       app.layers?.playersLayer.removeChildren();
 
-      clickHandler = (ev) => {
+      clickHandler = (event) => {
         if (!appRef.current || !socketRef.current) return;
 
-        const rect = appRef.current.canvas.getBoundingClientRect();
-        const x = ((ev.clientX - rect.left) / rect.width) * appRef.current.renderer.width;
-        const y = ((ev.clientY - rect.top) / rect.height) * appRef.current.renderer.height;
+        // PIXI pointer event → screen coordinates
+        const screenPos = event.global;
 
+        // Convert screen → world coordinates (undo scale + offset)
+        const worldPos = appRef.current.stage.toLocal(screenPos);
+
+        const x = worldPos.x;
+        const y = worldPos.y;
+
+        // Send to server
         socketRef.current.emit("move", { x, y });
 
+        // Move local avatar immediately
         const localId = playersRef.current.localUserId;
         const local = localId ? playersRef.current[localId] : null;
         if (local?.container) {
@@ -37,7 +44,9 @@ export function usePixiGame(initPixi, appRef, socketRef, playersRef, canvasRef) 
         }
       };
 
-      app.canvas.addEventListener("click", clickHandler);
+      // Instead of: app.canvas.addEventListener("click", clickHandler);
+      app.stage.eventMode = "static";
+      app.stage.on("pointerdown", clickHandler);
 
       return () => {
         app.layers?.playersLayer.removeChildren();
