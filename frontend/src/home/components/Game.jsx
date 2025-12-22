@@ -4,11 +4,13 @@ import ChatUI from "./ChatUI";
 import { usePixiApp } from "../hooks/usePixiApp";
 import { usePixiGame } from "../hooks/usePixiGame";
 import { useSocket } from "../hooks/useSocket";
-import { createOrUpdatePlayer } from "../hooks/usePlayers";
-import { showChatBubble } from "../utils/chatBubble";
+import { createOrUpdatePlayer, safeCreateOrUpdatePlayer } from "../hooks/usePlayers";
 import { animateTo } from "../utils/animate";
 import { textStyle } from "../utils/constants";
 import useAuthStore from '../../auth/stores/Auth.store';
+import { showChatBubble } from '../utils/showChatBubble';
+import { showTypingBubble } from '../utils/showTypingBubble';
+import { WORLD } from '../utils/constants';
 import "../styles/style.css";
 
 export default function Game({ onLogout, level = "forest" }) {
@@ -18,6 +20,21 @@ export default function Game({ onLogout, level = "forest" }) {
   const appRef = useRef(null);
   const socketRef = useRef(null);
   const playersRef = useRef({});
+  const typingRef = useRef(null);
+  const wasTypingRef = useRef(false);
+
+  // Function to switch levels dynamically
+  const switchLevel = async (newLevel) => {
+    const app = appRef.current;
+    if (!app?.roomManager) return;
+
+    try {
+      await app.roomManager.loadLevel(newLevel);
+      console.log(`Switched to level: ${newLevel}`);
+    } catch (err) {
+      console.error("Failed to switch level:", err);
+    }
+  };
 
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
@@ -29,35 +46,28 @@ export default function Game({ onLogout, level = "forest" }) {
     const localUserId = playersRef.current.localUserId;
     const isLocal = id === localUserId;
 
-    setMessages((m) => [{ from: id, name: isLocal ? "You" : username, message }, ...m].slice(0, 15));
+    setMessages((m) => [
+      { from: isLocal ? "You" : username, name: isLocal ? "You" : username, message },
+      ...m
+    ].slice(0, 20));
 
-    const p = playersRef.current[id];
-    if (p && appRef.current) showChatBubble(appRef.current, p, message, textStyle);
+    const player = playersRef.current[id];
+    if (player && appRef.current) showChatBubble(appRef.current, player, message, textStyle);
   };
 
-  const { initSocket, disconnectSocket } = useSocket(socketRef, {
-    localUser: (id) => { playersRef.current.localUserId = id; },
+  const { initSocket, disconnectSocket } = useSocket(socketRef, playersRef, {
+    localUser: (id) => {
+      playersRef.current.localUserId = id;
+    },
 
     initPlayers: (players) => {
       players.forEach((p) => {
-        if(!appRef.current) {
-          requestAnimationFrame(() => 
-            createOrUpdatePlayer(appRef.current, playersRef, p.id, p, p.id === socketRef.current.userId)
-          )
-        } else {
-          createOrUpdatePlayer(appRef.current, playersRef, p.id, p, p.id === socketRef.current.userId)
-        }
+        safeCreateOrUpdatePlayer(appRef, playersRef, p.id, p, p.id === socketRef.current.userId);
       });
     },
 
     playerJoined: (p) => {
-      if(!appRef.current) {
-        requestAnimationFrame(() => 
-          createOrUpdatePlayer(appRef.current, playersRef, p.id, p, p.id === socketRef.current.userId)
-        )
-      } else {
-        createOrUpdatePlayer(appRef.current, playersRef, p.id, p, p.id === socketRef.current.userId)
-      }
+      safeCreateOrUpdatePlayer(appRef, playersRef, p.id, p, p.id === socketRef.current.userId);
     },
 
     playerMoved: ({ id, x, y }) => {
@@ -78,27 +88,74 @@ export default function Game({ onLogout, level = "forest" }) {
     chatHistory: (history) => {
       const localUserId = socketRef.current?.userId;
       setMessages(
-        history.map((c) => ({
-          from: c.userId,
-          name: c.userId === localUserId ? "You" : c.username,
-          message: c.message,
-        })).slice(-15)
+        history
+          .map((c) => ({
+            from: c.userId,
+            name: c.userId === localUserId ? "You" : c.username,
+            message: c.message,
+          }))
+          .slice(-25)
       );
+    },
+
+    playerTyping: ({ id, typing }) => {
+      const player = playersRef.current[id];
+      if (!player || !appRef.current) return;
+
+      if (typing) {
+        if (!player.typingBubble) {
+          player.typingBubble = showTypingBubble(appRef.current, player, () => {
+            wasTypingRef.current = false;
+          });
+        } else {
+          player.typingBubble.resetTimeout();
+        }
+      } else {
+        if (player.typingBubble) {
+          player.typingBubble.cleanup();
+          player.typingBubble = null;
+        }
+      }
     },
   });
 
   useEffect(() => {
     if (userId) initSocket();
     else disconnectSocket();
-    return () => disconnectSocket();
+    
+    const handleBeforeUnload = () => {
+      disconnectSocket();
+    }
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      disconnectSocket();
+    }
   }, [userId]);
+
+  useEffect(() => {
+    const socket = socketRef.current;
+    if (!socket) return;
+
+    const isTyping = input.length > 0;
+
+    if (isTyping !== wasTypingRef.current) {
+      socket.emit("typing", { typing: isTyping });
+      wasTypingRef.current = isTyping;
+    }
+  }, [input]);
 
   const sendChat = () => {
     if (!socketRef.current || !input.trim()) return;
-    const localUserId = playersRef.current.localUserId;
-    if (localUserId && playersRef.current[localUserId] && appRef.current) {
-      showChatBubble(appRef.current, playersRef.current[localUserId], input, textStyle);
+
+    // Stop typing bubble
+    if (typingRef.current) {
+      typingRef.current.cleanup();
+      typingRef.current = null;
     }
+
     socketRef.current.emit("chat", { message: input });
     setInput("");
   };
@@ -109,15 +166,21 @@ export default function Game({ onLogout, level = "forest" }) {
   };
 
   return (
-    <div className="game-ui flex flex-col max-w-5xl min-h-screen max-h-screen justify-center items-center px-4 mx-auto">
-      <div className="flex flex-row gap-4 max-w-full mx-auto">
+    <div className="game-ui flex items-center justify-center min-h-screen w-full">
+      <div className="game-wrapper flex w-full max-w-8xl h-[700px] items-center justify-center">
+        <button
+          className="absolute top-4 right-4 text-white hover:text-neutral-50"
+          onClick={handleLogoutClick}>Logout</button>
         <div
-          className="flex justify-center"
-          ref={canvasRef}
-        />
+          style={{
+            width: "100%",
+            maxWidth: "100%",
+            maxHeight: "auto",
+          }}
+          className="canvas-container flex-1 h-full w-full"
+          ref={canvasRef}></div>
         <ChatUI messages={[...messages]} input={input} setInput={setInput} sendChat={sendChat} />
       </div>
-      <button onClick={handleLogoutClick}>Logout</button>
     </div>
   );
 }

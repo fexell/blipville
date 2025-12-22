@@ -40,7 +40,7 @@ const HomePage                              = () => {
 
   return (
     <>
-      <div className=''>
+      <div className='flex min-h-screen justify-center items-center'>
         { userId && (
           <ErrorBoundary>
             <Game onLogout={handleLogout} level="forest" />

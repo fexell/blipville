@@ -33,10 +33,17 @@ const SlowDownLimiterMiddleware             = slowDown( {
   delayMs                                   : ( hits ) => hits * 500,
 } )
 
+const ParseSignedCookies                    = ( secret ) => {
+  const parser                              = cookieParser( COOKIE_SECRET )
+
+  return ( socket, next ) => parser( socket.request, {}, next )
+}
+
 export {
   CookieParserMiddleware,
   SecurityMiddlewares as default,
   CsrfProtectionMiddleware,
   LimiterMiddleware,
   SlowDownLimiterMiddleware,
+  ParseSignedCookies,
 }

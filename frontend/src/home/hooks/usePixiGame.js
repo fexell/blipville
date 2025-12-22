@@ -7,7 +7,16 @@ export function usePixiGame(initPixi, appRef, socketRef, playersRef, canvasRef) 
 
     const setup = async () => {
       const app = await initPixi();
-      appRef.current = app;
+      appRef.current = app; // store PIXI app directly
+
+      // Update bubbles every frame
+      app.ticker.add(() => {
+        const players = playersRef.current;
+        for (const id in players) {
+          const p = players[id];
+          if (p.updateBubbles) p.updateBubbles();
+        }
+      });
 
       // Clear old players layer for Fast Refresh safety
       app.layers?.playersLayer.removeChildren();
@@ -25,8 +34,6 @@ export function usePixiGame(initPixi, appRef, socketRef, playersRef, canvasRef) 
         const local = localId ? playersRef.current[localId] : null;
         if (local?.container) {
           animateTo(local.container, x, y);
-          local.x = x;
-          local.y = y;
         }
       };
 
@@ -36,7 +43,7 @@ export function usePixiGame(initPixi, appRef, socketRef, playersRef, canvasRef) 
         app.layers?.playersLayer.removeChildren();
         if (canvasRef.current) canvasRef.current.innerHTML = "";
         if (clickHandler) app.canvas.removeEventListener("click", clickHandler);
-        appRef.current.destroy({ children: true, texture: true, baseTexture: true });
+        app.destroy({ children: true, texture: true, baseTexture: true });
         appRef.current = null;
       };
     };

@@ -1,1 +1,5 @@
-export { forestLevel } from './forestLevel'
+import { forestLevel } from './forestLevel';
+
+export const levels = {
+  forest: forestLevel
+}
